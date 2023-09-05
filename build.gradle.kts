@@ -1,7 +1,6 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.1.3"
-    id("io.spring.dependency-management") version "1.1.3"
+    alias(libs.plugins.spring.boot)
 }
 
 group = "com.github.daniel-shuy"
@@ -16,8 +15,11 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation(platform(libs.spring.boot.dependencies))
+
+    implementation(libs.spring.boot.starter)
+
+    testImplementation(libs.spring.boot.starter.test)
 }
 
 tasks.withType<Test> {
