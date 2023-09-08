@@ -1,11 +1,26 @@
 [versions]
 java = "17"
+lombok = "1.18.28"
+lombokPlugin = "8.3"
+mapstruct = "1.5.5.Final"
 springBoot = "3.1.3"
+springdocOpenapi = "2.2.0"
 
 [libraries]
+h2-database = { group = "com.h2database", name = "h2" }
+hibernate-jpamodelgen = { group = "org.hibernate.orm", name = "hibernate-jpamodelgen"}
+mapstruct-core = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
+mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
 spring-boot-dependencies = { group = "org.springframework.boot",  name = "spring-boot-dependencies", version.ref = "springBoot" }
+spring-boot-devtools = { group = "org.springframework.boot", name = "spring-boot-devtools" }
 spring-boot-starter = { group = "org.springframework.boot", name = "spring-boot-starter" }
+spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
+spring-boot-starter-oauth2-authorization-server = { group = "org.springframework.boot", name = "spring-boot-starter-oauth2-authorization-server" }
 spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation" }
+spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+springdoc-openapi-ui = { group = "org.springdoc", name = "springdoc-openapi-starter-webmvc-ui", version.ref = "springdocOpenapi" }
 
 [plugins]
+lombok = { id = "io.freefair.lombok", version.ref = "lombokPlugin" }
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }

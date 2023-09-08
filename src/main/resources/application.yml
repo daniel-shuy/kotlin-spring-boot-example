@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:db
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  jpa:
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        event:
+          merge:
+            entity_copy_observer: allow
+        # automatically escape SQL reserved keywords
+        globally_quoted_identifiers: true
+        globally_quoted_identifiers_skip_column_definitions: true
+
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          oidc-client:
+            registration:
+              client-id: oidc-client
+              client-secret: "{noop}secret"
+              client-authentication-methods:
+                - client_secret_basic
+              authorization-grant-types:
+                - authorization_code
+                - refresh_token
+              redirect-uris:
+                - http://localhost:8080/login/oauth2/code/oidc-client
+              post-logout-redirect-uris:
+                - http://localhost:8080/swagger-ui.html
+              scopes:
+                - openid
+                - profile
+
+springdoc:
+  swagger-ui:
+    csrf:
+      enabled: true
