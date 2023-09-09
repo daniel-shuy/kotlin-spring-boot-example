@@ -1,14 +1,21 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-    java
     alias(libs.plugins.spring.boot)
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.spring)
+    alias(libs.plugins.kotlin.jpa)
+    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.lombok)
 }
 
 group = "com.github.daniel-shuy"
 version = "0.0.1-SNAPSHOT"
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
+kotlin {
+    jvmToolchain {
+        (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(libs.versions.java.get()))
+    }
 }
 
 repositories {
@@ -17,27 +24,37 @@ repositories {
 
 dependencies {
     implementation(platform(libs.spring.boot.dependencies))
-    annotationProcessor(platform(libs.spring.boot.dependencies))
+    kapt(platform(libs.spring.boot.dependencies))
 
+    implementation(libs.kotlin.reflect)
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)
+    implementation(libs.jackson.module.kotlin)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.springdoc.openapi.ui)
     implementation(libs.spring.boot.starter.data.jpa)
     implementation(libs.spring.boot.starter.oauth2.authorization.server)
+    implementation(libs.kotlin.logging)
     implementation(libs.mapstruct.core)
 
-    annotationProcessor(libs.hibernate.jpamodelgen)
-    annotationProcessor(libs.mapstruct.processor)
+    kapt(libs.hibernate.jpamodelgen)
+    kapt(libs.mapstruct.processor)
 
     runtimeOnly(libs.spring.boot.devtools)
     runtimeOnly(libs.h2.database)
 
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.mockito.kotlin)
 }
 
 lombok {
     version = libs.versions.lombok.get()
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs += "-Xjsr305=strict"
+    }
 }
 
 tasks.withType<Test> {
