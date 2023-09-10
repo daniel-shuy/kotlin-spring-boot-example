@@ -2,6 +2,7 @@ package com.github.daniel.shuy.kotlin.spring.boot.example.controller
 
 import com.github.daniel.shuy.kotlin.spring.boot.example.dto.PetDto
 import com.github.daniel.shuy.kotlin.spring.boot.example.dto.PetFilterDto
+import com.github.daniel.shuy.kotlin.spring.boot.example.dto.PetId
 import com.github.daniel.shuy.kotlin.spring.boot.example.mapper.PetMapper
 import com.github.daniel.shuy.kotlin.spring.boot.example.service.PetService
 import jakarta.validation.Valid
@@ -57,7 +58,7 @@ class PetController(
         path = ["/{id}"],
         produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun findPet(@PathVariable id: Long): ResponseEntity<PetDto> {
+    fun findPet(@PathVariable id: PetId): ResponseEntity<PetDto> {
         val pet = petService.findPetById(id)
         return ResponseEntity
             .ok(petMapper.mapToDto(pet))
@@ -74,7 +75,7 @@ class PetController(
     }
 
     @DeleteMapping(path = ["/{id}"])
-    fun deletePet(@PathVariable id: Long) {
+    fun deletePet(@PathVariable id: PetId) {
         petService.deletePet(id)
     }
 

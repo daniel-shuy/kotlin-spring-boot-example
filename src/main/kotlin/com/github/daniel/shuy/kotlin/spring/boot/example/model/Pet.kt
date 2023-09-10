@@ -1,5 +1,6 @@
 package com.github.daniel.shuy.kotlin.spring.boot.example.model
 
+import com.github.daniel.shuy.kotlin.spring.boot.example.dto.PetId
 import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
@@ -22,5 +23,5 @@ class Pet(
 ) {
     @Id
     @GeneratedValue
-    var id: Long? = null
+    var id: PetId? = null
 }

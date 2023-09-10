@@ -2,6 +2,7 @@ package com.github.daniel.shuy.kotlin.spring.boot.example.service
 
 import com.github.daniel.shuy.kotlin.spring.boot.example.dto.PetDto
 import com.github.daniel.shuy.kotlin.spring.boot.example.dto.PetFilterDto
+import com.github.daniel.shuy.kotlin.spring.boot.example.dto.PetId
 import com.github.daniel.shuy.kotlin.spring.boot.example.mapper.PetMapper
 import com.github.daniel.shuy.kotlin.spring.boot.example.model.Pet
 import com.github.daniel.shuy.kotlin.spring.boot.example.properties.PetProperties
@@ -41,7 +42,7 @@ class PetService(
         return petRepository.findAll(specification, pageable)
     }
 
-    fun findPetById(petId: Long): Pet {
+    fun findPetById(petId: PetId): Pet {
         return petRepository.findByIdOrNull(petId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
@@ -57,7 +58,7 @@ class PetService(
         }
     }
 
-    fun deletePet(petId: Long) {
+    fun deletePet(petId: PetId) {
         val pet = findPetById(petId)
         petRepository.delete(pet)
         logger.info { "Deleted Pet with id ${pet.id}" }
