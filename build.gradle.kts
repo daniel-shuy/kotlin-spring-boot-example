@@ -30,7 +30,8 @@ dependencies {
 
     implementation(libs.kotlin.reflect)
     implementation(libs.spring.boot.starter)
-    implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.webflux)
+    implementation(libs.kotlinx.coroutines.reactor)
     implementation(libs.kotlinx.serialization)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.springdoc.openapi.ui)

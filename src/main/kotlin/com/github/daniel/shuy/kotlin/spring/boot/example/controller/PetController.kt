@@ -36,7 +36,7 @@ class PetController(
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun createPet(@Valid @RequestBody petDto: PetDto): ResponseEntity<PetDto> {
+    suspend fun createPet(@Valid @RequestBody petDto: PetDto): ResponseEntity<PetDto> {
         val pet = petService.createPet(petDto)
         return ResponseEntity
             .ok(petMapper.mapToDto(pet))
@@ -45,7 +45,7 @@ class PetController(
     @GetMapping(
         produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun findPets(
+    suspend fun findPets(
         @ParameterObject pageable: Pageable,
         @Valid @ParameterObject petFilterDto: PetFilterDto,
     ): ResponseEntity<Page<PetDto>> {
@@ -58,7 +58,7 @@ class PetController(
         path = ["/{id}"],
         produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun findPet(@PathVariable id: PetId): ResponseEntity<PetDto> {
+    suspend fun findPet(@PathVariable id: PetId): ResponseEntity<PetDto> {
         val pet = petService.findPetById(id)
         return ResponseEntity
             .ok(petMapper.mapToDto(pet))
@@ -68,14 +68,14 @@ class PetController(
         consumes = [MediaType.APPLICATION_JSON_VALUE],
         produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun updatePet(@Valid @RequestBody petDto: PetDto): ResponseEntity<PetDto> {
+    suspend fun updatePet(@Valid @RequestBody petDto: PetDto): ResponseEntity<PetDto> {
         val pet = petService.updatePet(petDto)
         return ResponseEntity
             .ok(petMapper.mapToDto(pet))
     }
 
     @DeleteMapping(path = ["/{id}"])
-    fun deletePet(@PathVariable id: PetId) {
+    suspend fun deletePet(@PathVariable id: PetId) {
         petService.deletePet(id)
     }
 
@@ -83,7 +83,7 @@ class PetController(
         path = ["/sold-count-by-tag"],
         produces = [MediaType.APPLICATION_JSON_VALUE],
     )
-    fun getSoldCountByTag(): ResponseEntity<Map<String, Number>> {
+    suspend fun getSoldCountByTag(): ResponseEntity<Map<String, Number>> {
         return ResponseEntity
             .ok(petService.getSoldCountByTag())
     }
