@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
     alias(libs.plugins.spring.boot)
@@ -7,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.jpa)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ktlint)
 }
 
 group = "com.github.daniel-shuy"
@@ -45,6 +47,10 @@ dependencies {
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.mockito.kotlin)
+}
+
+configure<KtlintExtension> {
+    version.set(libs.versions.ktlint.get())
 }
 
 tasks.withType<KotlinCompile> {
