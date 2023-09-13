@@ -2,6 +2,7 @@
 java = "17"
 kotlin = "1.9.10"
 kotlinLogging = "5.1.0"
+kotlinxSerialization = "1.6.0"
 mapstruct = "1.5.5.Final"
 mockitoKotlin = "5.1.0"
 springBoot = "3.1.3"
@@ -10,9 +11,9 @@ springdocOpenapi = "2.2.0"
 [libraries]
 h2-database = { group = "com.h2database", name = "h2" }
 hibernate-jpamodelgen = { group = "org.hibernate.orm", name = "hibernate-jpamodelgen"}
-jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin" }
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlinLogging" }
 kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
+kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 mapstruct-core = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
 mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
@@ -30,5 +31,6 @@ springdoc-openapi-ui = { group = "org.springdoc", name = "springdoc-openapi-star
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
 spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }

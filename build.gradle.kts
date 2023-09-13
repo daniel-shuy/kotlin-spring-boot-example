@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 group = "com.github.daniel-shuy"
@@ -28,7 +29,7 @@ dependencies {
     implementation(libs.kotlin.reflect)
     implementation(libs.spring.boot.starter)
     implementation(libs.spring.boot.starter.web)
-    implementation(libs.jackson.module.kotlin)
+    implementation(libs.kotlinx.serialization)
     implementation(libs.spring.boot.starter.validation)
     implementation(libs.springdoc.openapi.ui)
     implementation(libs.spring.boot.starter.data.jpa)

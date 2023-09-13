@@ -3,8 +3,10 @@ package com.github.daniel.shuy.kotlin.spring.boot.example.dto
 import com.github.daniel.shuy.kotlin.spring.boot.example.model.Pet
 import com.github.daniel.shuy.kotlin.spring.boot.example.model.Status
 import com.github.daniel.shuy.kotlin.spring.boot.example.specification.PetSpecifications
+import kotlinx.serialization.Serializable
 import org.springframework.data.jpa.domain.Specification
 
+@Serializable
 data class PetFilterDto(
     val namePattern: String? = null,
     val status: Status? = null,
