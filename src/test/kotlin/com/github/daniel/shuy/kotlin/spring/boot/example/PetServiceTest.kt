@@ -9,12 +9,13 @@ import com.github.daniel.shuy.kotlin.spring.boot.example.properties.PetPropertie
 import com.github.daniel.shuy.kotlin.spring.boot.example.repository.PetRepository
 import com.github.daniel.shuy.kotlin.spring.boot.example.service.PetService
 import com.github.daniel.shuy.kotlin.spring.boot.example.specification.PetSpecifications
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.ShouldSpec
+import io.kotest.matchers.collections.shouldBeSameSizeAs
+import io.kotest.matchers.equals.shouldBeEqual
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.mockk.every
 import io.mockk.mockk
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Condition
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -23,15 +24,13 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestConstructor
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.server.ResponseStatusException
 import java.util.concurrent.atomic.AtomicLong
 
-@ExtendWith(SpringExtension::class)
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-private class PetServiceTest(
+class PetServiceTest(
     private val petService: PetService,
-) {
+) : ShouldSpec() {
     companion object {
         private const val PET_NAME_MAX_LENGTH = 10
 
@@ -61,126 +60,93 @@ private class PetServiceTest(
         private val EXISTING_PETS = listOf(PET_1, PET_2, PET_3)
     }
 
-    @Test
-    fun createPetTest() {
-        // GIVEN
-        val petDto = PetDto(
-            name = "Pet",
-            status = Status.AVALAILABLE,
-        )
+    init {
+        context("PetService") {
+            should("Create Pet") {
+                val petDto = PetDto(
+                    name = "Pet",
+                    status = Status.AVALAILABLE,
+                )
+                petService.createPet(petDto).run {
+                    id.shouldNotBeNull()
+                    name.shouldBeEqual(petDto.name)
+                    status.shouldBeEqual(petDto.status)
+                }
+            }
 
-        // WHEN
-        val createdPet = petService.createPet(petDto)
+            should("Throw exception on creating Pet with invalid name format") {
+                shouldThrow<ResponseStatusException> {
+                    petService.createPet(
+                        PetDto(
+                            name = "X Æ A-12",
+                            status = Status.AVALAILABLE,
+                        ),
+                    )
+                }.run {
+                    statusCode.shouldBeEqual(HttpStatus.BAD_REQUEST)
+                    reason
+                        .shouldNotBeNull()
+                        .shouldBeEqual("Name can only contain alphabetic or space characters")
+                }
+            }
 
-        // THEN
-        Assertions.assertThat(createdPet.id)
-            .isNotNull
-        Assertions.assertThat(createdPet.name)
-            .isEqualTo(petDto.name)
-        Assertions.assertThat(createdPet.status)
-            .isEqualTo(petDto.status)
-    }
+            should("Throw exception on creating Pet with invalid name length") {
+                shouldThrow<ResponseStatusException> {
+                    petService.createPet(
+                        PetDto(
+                            name = "abcdefghijklmnopqrstuvwxyz",
+                            status = Status.AVALAILABLE,
+                        ),
+                    )
+                }.run {
+                    statusCode.shouldBeEqual(HttpStatus.BAD_REQUEST)
+                    reason
+                        .shouldNotBeNull()
+                        .shouldBeEqual("Name cannot be longer than $PET_NAME_MAX_LENGTH")
+                }
+            }
 
-    @Test
-    fun createPetInvalidNameFormatTest() {
-        // GIVEN
-        val petDto = PetDto(
-            name = "X Æ A-12",
-            status = Status.AVALAILABLE,
-        )
+            should("Update Pet") {
+                val petStatus = Status.SOLD
+                petService.updatePet(
+                    PetDto(
+                        id = PET_1.id,
+                        name = PET_1.name,
+                        status = petStatus,
+                    ),
+                ).run {
+                    id
+                        .shouldNotBeNull()
+                        .shouldBeEqual(PET_1.id!!)
+                    name.shouldBeEqual(PET_1.name)
+                    status.shouldBeEqual(petStatus)
+                }
+            }
 
-        // WHEN
-        Assertions.assertThatExceptionOfType(ResponseStatusException::class.java)
-            .isThrownBy { petService.createPet(petDto) } // THEN
-            .`is`(
-                Condition(
-                    { ex -> ex.statusCode == HttpStatus.BAD_REQUEST },
-                    "status code Bad Request",
-                ),
-            )
-            .withMessage("400 BAD_REQUEST \"Name can only contain alphabetic or space characters\"")
-    }
+            should("Find Pets") {
+                petService.findPets(PetFilterDto(), Pageable.unpaged()).run {
+                    content.shouldBeSameSizeAs(EXISTING_PETS)
+                }
+            }
 
-    @Test
-    fun createPetInvalidNameLengthTest() {
-        // GIVEN
-        val petDto = PetDto(
-            name = "abcdefghijklmnopqrstuvwxyz",
-            status = Status.AVALAILABLE,
-        )
+            should("Get Pet by ID") {
+                petService.findPetById(PET_1.id!!).run {
+                    id
+                        .shouldNotBeNull()
+                        .shouldBeEqual(PET_1.id!!)
+                    name.shouldBeEqual(PET_1.name)
+                    status.shouldBeEqual(PET_1.status)
+                }
+            }
 
-        // WHEN
-        Assertions.assertThatExceptionOfType(ResponseStatusException::class.java)
-            .isThrownBy { petService.createPet(petDto) } // THEN
-            .`is`(
-                Condition(
-                    { ex -> ex.statusCode == HttpStatus.BAD_REQUEST },
-                    "status code Bad Request",
-                ),
-            )
-            .withMessage("400 BAD_REQUEST \"Name cannot be longer than %d\"", PET_NAME_MAX_LENGTH)
-    }
-
-    @Test
-    fun updatePetTest() {
-        // GIVEN
-        val petStatus = Status.SOLD
-        val petDto = PetDto(
-            id = PET_1.id,
-            name = PET_1.name,
-            status = petStatus,
-        )
-
-        // WHEN
-        val updatedPet = petService.updatePet(petDto)
-
-        // THEN
-        Assertions.assertThat(updatedPet.id)
-            .isEqualTo(PET_1.id)
-        Assertions.assertThat(updatedPet.name)
-            .isEqualTo(PET_1.name)
-        Assertions.assertThat(updatedPet.status)
-            .isEqualTo(petStatus)
-    }
-
-    @Test
-    fun findPetsTest() {
-        // WHEN
-        val pets = petService.findPets(PetFilterDto(), Pageable.unpaged())
-
-        // THEN
-        Assertions.assertThat(pets.content)
-            .hasSameSizeAs(EXISTING_PETS)
-    }
-
-    @Test
-    fun getPetByIdTest() {
-        // WHEN
-        val pet = petService.findPetById(PET_1.id!!)
-
-        // THEN
-        Assertions.assertThat(pet.id)
-            .isEqualTo(PET_1.id)
-        Assertions.assertThat(pet.name)
-            .isEqualTo(PET_1.name)
-        Assertions.assertThat(pet.status)
-            .isEqualTo(PET_1.status)
-    }
-
-    @Test
-    fun getPetByIdNotFoundTest() {
-        // GIVEN
-        val petId = SEQUENCE_PET_ID.incrementAndGet()
-
-        // WHEN
-        Assertions.assertThatExceptionOfType(ResponseStatusException::class.java)
-            .isThrownBy { petService.findPetById(petId) } // THEN
-            .`is`(
-                Condition(
-                    { ex -> ex.statusCode == HttpStatus.NOT_FOUND },
-                    "status code Not Found",
-                ),
-            )
+            should("Throw exception on getting Pet with non-existent ID") {
+                shouldThrow<ResponseStatusException> {
+                    petService.findPetById(SEQUENCE_PET_ID.incrementAndGet())
+                }.run {
+                    statusCode.shouldBeEqual(HttpStatus.NOT_FOUND)
+                }
+            }
+        }
     }
 
     @TestConfiguration

@@ -46,6 +46,7 @@ dependencies {
     runtimeOnly(libs.h2.database)
 
     testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.bundles.kotest)
     testImplementation(libs.mockk)
 }
 
