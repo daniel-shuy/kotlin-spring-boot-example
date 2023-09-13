@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.spring)
     alias(libs.plugins.kotlin.jpa)
     alias(libs.plugins.kotlin.kapt)
-    alias(libs.plugins.lombok)
 }
 
 group = "com.github.daniel-shuy"
@@ -45,10 +44,6 @@ dependencies {
 
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.mockito.kotlin)
-}
-
-lombok {
-    version = libs.versions.lombok.get()
 }
 
 tasks.withType<KotlinCompile> {
