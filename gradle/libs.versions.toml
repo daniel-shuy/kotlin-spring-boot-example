@@ -6,7 +6,7 @@ kotlinxSerialization = "1.6.0"
 ktlint = "0.50.0"
 ktlintPlugin = "11.5.1"
 mapstruct = "1.5.5.Final"
-mockitoKotlin = "5.1.0"
+mockK = "1.13.7"
 springBoot = "3.1.3"
 springdocOpenapi = "2.2.0"
 
@@ -18,7 +18,7 @@ kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 mapstruct-core = { group = "org.mapstruct", name = "mapstruct", version.ref = "mapstruct" }
 mapstruct-processor = { group = "org.mapstruct", name = "mapstruct-processor", version.ref = "mapstruct" }
-mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockK" }
 spring-boot-dependencies = { group = "org.springframework.boot",  name = "spring-boot-dependencies", version.ref = "springBoot" }
 spring-boot-devtools = { group = "org.springframework.boot", name = "spring-boot-devtools" }
 spring-boot-starter = { group = "org.springframework.boot", name = "spring-boot-starter" }

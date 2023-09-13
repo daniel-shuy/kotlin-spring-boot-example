@@ -9,24 +9,22 @@ import com.github.daniel.shuy.kotlin.spring.boot.example.properties.PetPropertie
 import com.github.daniel.shuy.kotlin.spring.boot.example.repository.PetRepository
 import com.github.daniel.shuy.kotlin.spring.boot.example.service.PetService
 import com.github.daniel.shuy.kotlin.spring.boot.example.specification.PetSpecifications
+import io.mockk.every
+import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Condition
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.any
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.web.server.ResponseStatusException
-import java.util.Optional
 import java.util.concurrent.atomic.AtomicLong
 
 @ExtendWith(SpringExtension::class)
@@ -196,22 +194,24 @@ private class PetServiceTest(
         fun mockPetProperties() = PetProperties(PET_NAME_MAX_LENGTH)
 
         @Bean
-        fun mockPetRepository(): PetRepository = mock {
-            on { save(any<Pet>()) } doAnswer { invocation ->
-                val pet = invocation.getArgument<Pet>(0)
+        fun mockPetRepository(): PetRepository = mockk {
+            every { save(any()) } answers {
+                val pet = it.invocation.args[0] as Pet
                 if (pet.id == null) {
                     pet.id = SEQUENCE_PET_ID.incrementAndGet()
                 }
-                return@doAnswer pet.clone()
+                return@answers pet.clone()
             }
 
-            on { findById(any()) } doReturn Optional.empty()
+            every { findByIdOrNull(any()) } answers { null }
             EXISTING_PETS.forEach { pet ->
-                on { findById(pet.id!!) } doReturn Optional.of(pet.clone())
+                every { findByIdOrNull(pet.id!!) } answers { pet.clone() }
             }
 
-            on { findAll(any(), any<Pageable>()) } doReturn PageImpl(EXISTING_PETS)
-                .map(Pet::clone)
+            every { findAll(any(), any<Pageable>()) } answers {
+                PageImpl(EXISTING_PETS)
+                    .map(Pet::clone)
+            }
         }
     }
 }
