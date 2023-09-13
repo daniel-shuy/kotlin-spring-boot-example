@@ -6,9 +6,9 @@ import org.springdoc.core.properties.SwaggerUiConfigParameters
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.provisioning.InMemoryUserDetailsManager
@@ -31,59 +31,50 @@ class SecurityConfig(
 
     @Bean
     fun defaultSecurityFilterChain(http: HttpSecurity, introspector: HandlerMappingIntrospector): SecurityFilterChain {
-        http
-            .csrf { csrf ->
-                csrf
-                    .ignoringRequestMatchers(PathRequest.toH2Console())
-                    .csrfTokenRepository(
-                        CookieCsrfTokenRepository.withHttpOnlyFalse().apply {
-                            cookiePath = "/"
-                        },
-                    )
-                    .csrfTokenRequestHandler(
-                        CsrfTokenRequestAttributeHandler().apply {
-                            setCsrfRequestAttributeName(null)
-                        },
-                    )
+        http {
+            csrf {
+                ignoringRequestMatchers(PathRequest.toH2Console())
+                csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse().apply {
+                    cookiePath = "/"
+                }
+                csrfTokenRequestHandler = CsrfTokenRequestAttributeHandler().apply {
+                    setCsrfRequestAttributeName(null)
+                }
             }
-            .headers { headers ->
-                headers
-                    .frameOptions { frameOptions ->
-                        frameOptions
-                            // required for H2 Console
-                            .sameOrigin()
-                    }
+
+            headers {
+                frameOptions {
+                    sameOrigin = true // required for H2 Console
+                }
             }
-            .authorizeHttpRequests { authorize ->
-                authorize
-                    .requestMatchers(PathRequest.toH2Console())
-                    .authenticated()
+
+            authorizeHttpRequests {
+                authorize(PathRequest.toH2Console(), permitAll)
 
                 // springdoc-openapi
                 springDocConfigProperties?.apiDocs?.path?.let {
-                    authorize.requestMatchers(AntPathRequestMatcher.antMatcher("$it/**"))
-                        .authenticated()
+                    authorize(AntPathRequestMatcher.antMatcher("$it/**"), authenticated)
                 }
-                authorize.requestMatchers(
-                    AntPathRequestMatcher.antMatcher(
-                        "${swaggerUiConfigParameters?.uiRootPath ?: ""}/swagger-ui/**",
-                    ),
+                authorize(
+                    AntPathRequestMatcher.antMatcher("${swaggerUiConfigParameters?.uiRootPath ?: ""}/swagger-ui/**"),
+                    authenticated,
                 )
-                    .authenticated()
                 swaggerUiConfigParameters?.path?.let {
-                    authorize.requestMatchers(AntPathRequestMatcher.antMatcher(it))
-                        .authenticated()
+                    authorize(AntPathRequestMatcher.antMatcher(it), authenticated)
                 }
 
                 val mvcMatcherBuilder = MvcRequestMatcher.Builder(introspector)
-                authorize
-                    .requestMatchers(mvcMatcherBuilder.pattern("${PetController.REQUEST_MAPPING_PATH}/**"))
-                    .hasAuthority(AUTHORITY_USER)
-                    .anyRequest()
-                    .denyAll()
-            }
-            .formLogin(Customizer.withDefaults())
+                authorize(
+                    mvcMatcherBuilder.pattern("${PetController.REQUEST_MAPPING_PATH}/**"),
+                    hasAuthority(AUTHORITY_USER),
+                )
 
+                authorize(anyRequest, denyAll)
+            }
+
+            formLogin {
+            }
+        }
         return http.build()
     }
 
